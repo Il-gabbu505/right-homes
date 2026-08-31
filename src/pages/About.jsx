@@ -2,23 +2,41 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, useTexture } from '@react-three/drei';
 import { motion as motion3d } from 'framer-motion-3d';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import DoorModel from './Door'; 
 
-// --- UPDATED DATA ---
+// --- EXCLUSIVELY EXCEL DATA (With Images) ---
 const MOCK_AGENTS = [
-  { id: 1, name: 'Mehdi Bezine', role: 'Director', phone: '99978211', email: 'mehdi@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 2, name: 'Charlton Gatt', role: 'Real Estate Sales Agent', phone: '79091571', email: 'charlton@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=250&q=80' },
-  { id: 3, name: 'Mark Borg', role: 'Real Estate Sales Agent', phone: '99978214', email: 'mark@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=250&q=80' },
-  { id: 4, name: 'Leanne Gatt', role: 'Real Estate Sales Agent', phone: '79244282', email: 'leanne@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80' },
-  { id: 5, name: 'Clint Barbara', role: 'Real Estate Sales Agent', phone: '79709796', email: 'clint@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 6, name: 'Head Office', role: '', phone: '99978211', email: 'chloe@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 7, name: 'Quelin Sammut', role: 'Real Estate Sales Agent', phone: '79958683', email: 'quelin@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 8, name: 'Jeffrey Briffa Cauchi', role: 'Real Estate Sales Agent', phone: '77098050', email: 'jeffrey@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 9, name: 'Donovan Vella', role: '', phone: '79051387', email: 'donovan@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 10, name: 'Christian Gauci', role: '', phone: '99438127', email: 'christian@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 11, name: 'Luke Vassallo', role: '', phone: '79551248', email: 'luke@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
-  { id: 12, name: 'Marlon Sammut', role: '', phone: '79919212', email: 'marlon@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80' },
+  { 
+    id: 1, name: 'Caroline Agius', role: 'Receptionist', phone: '77160394', email: 'caroline@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
+    specialization: 'Updating systems and ensuring smooth operations', experience: '1 Year', 
+    tip: 'Direct people to the right agent.', fact: 'I am a little bit clumsy sometimes!'
+  },
+  { 
+    id: 2, name: 'Clint Barbara', role: 'Real Estate Agent', phone: '79709796', email: 'clint@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    specialization: 'South/Central West Areas (Mqabba, Qrendi, Kirkop, Zurrieq, Safi, Siggiewi, Zebbug)', experience: '8 Years', 
+    tip: 'Know your priorities, but keep an open mind. Focus on location and potential, because finishes can change, but fundamentals usually can’t.', fact: 'I’m a people person by nature. Even when off duty, I imagine how properties could be transformed.'
+  },
+  { 
+    id: 3, name: 'Mehdi Bezine', role: 'Real Estate Agent', phone: '99978211', email: 'mehdi@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    specialization: 'Central & North Malta', experience: '11 Years', 
+    tip: 'The best time to buy is always 5 years ago, the next best time is today!', fact: 'I’m a father of 3 daughters, love traveling and always learning.'
+  },
+  { 
+    id: 4, name: 'Marlon Sammut', role: 'Real Estate Agent', phone: '79919212', email: 'marlon@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    specialization: 'Central Malta', experience: '1 Year', 
+    tip: 'If you love a property, act with confidence. Good opportunities don’t always stay on the market for long.', fact: 'I believe every property has a story, I just help people find theirs.'
+  },
+  { 
+    id: 5, name: 'Quelin Sammut', role: 'Real Estate Agent', phone: '79958686', email: 'quelin@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    specialization: 'Central Malta', experience: '4 Years', 
+    tip: 'Be clear about your priorities, but keep an open mind. Sometimes the right property isn’t the one you initially pictured.', fact: 'I wanted to be an architect—now I just judge floor plans for a living.'
+  },
+  { 
+    id: 6, name: 'Leanne Gatt', role: 'Real Estate Agent', phone: '79244282', email: 'leanne@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
+    specialization: 'South Malta', experience: '5 Years', 
+    tip: 'Price matters. Location matters more.', fact: 'I’m a fan of good food, good laughs, great company and unforgettable family trips. ❤️'
+  }
 ];
 
 function InteriorBackground() {
@@ -33,13 +51,13 @@ function InteriorBackground() {
 
 export default function About() {
   const [isEntered, setIsEntered] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState(null); 
+  const carouselRef = useRef();
   
   useEffect(() => {
     const timer = setTimeout(() => setIsEntered(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const carouselRef = useRef();
 
   const scroll = (direction) => {
     if (carouselRef.current) {
@@ -160,24 +178,18 @@ export default function About() {
             }}
           >
             {MOCK_AGENTS.map((agent, index) => (
-              
-              /* 
-                 THE CARD MAGIC HAPPENS HERE: 
-                 By setting `whileHover="hover"`, we tell this card AND everything 
-                 inside it (like the image) to run their "hover" variant animation!
-              */
               <motion.div 
                 key={agent.id} 
                 initial="hidden"
                 animate={isEntered ? "visible" : "hidden"}
                 whileHover="hover"
+                onClick={() => setSelectedAgent(agent)} 
                 variants={{
                   hidden: { y: 50, opacity: 0, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)' },
                   visible: { 
                     y: 0, opacity: 1, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
                     transition: { delay: 2.0 + (index * 0.05), type: 'spring', stiffness: 100 }
                   },
-                  // The new glow, border, and float effect
                   hover: { 
                     y: -12, 
                     borderColor: '#c48b63', 
@@ -198,14 +210,12 @@ export default function About() {
                   overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
                   boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)'
                 }}>
-                  {/* Notice this is now a <motion.img>! It waits for the card to be hovered, then zooms. */}
                   <motion.img 
                     src={agent.image} 
                     alt={agent.name} 
                     variants={{
                       hidden: { scale: 1, opacity: 0.85 },
                       visible: { scale: 1, opacity: 0.85 },
-                      // The new image zoom effect
                       hover: { scale: 1.15, opacity: 1 }
                     }}
                     transition={{ duration: 0.3, ease: 'easeOut' }}
@@ -218,7 +228,7 @@ export default function About() {
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#475569', fontSize: '0.8rem', fontWeight: '500' }}>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    📞 {agent.phone}
+                    📞 +356 {agent.phone}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     ✉️ {agent.email}
@@ -229,6 +239,84 @@ export default function About() {
           </div>
         </div>
       </motion.div>
+
+      {/* --- AGENT MODAL POPUP --- */}
+      <AnimatePresence>
+        {selectedAgent && (
+          <motion.div 
+            key="modal-overlay"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            onClick={() => setSelectedAgent(null)} 
+            style={{
+              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
+              fontFamily: '"Inter", sans-serif'
+            }}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()} 
+              style={{
+                backgroundColor: 'white', borderRadius: '16px', padding: '40px', 
+                maxWidth: '600px', width: '100%', position: 'relative',
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+              }}
+            >
+              <button 
+                onClick={() => setSelectedAgent(null)}
+                style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}
+              >
+                ✕
+              </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
+                <div style={{ 
+                  width: '80px', height: '80px', borderRadius: '50%', overflow: 'hidden', 
+                  border: '3px solid #c48b63', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' 
+                }}>
+                  <img src={selectedAgent.image} alt={selectedAgent.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div>
+                  <h2 style={{ margin: '0 0 5px 0', fontSize: '1.8rem', color: '#0f172a', fontWeight: '800' }}>{selectedAgent.name}</h2>
+                  <p style={{ margin: 0, color: '#c48b63', fontWeight: '600', fontSize: '1.1rem' }}>{selectedAgent.role}</p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'flex', gap: '15px' }}>
+                  <div style={{ flex: 1 }}>
+                    <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>📞 Direct Contact:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>+356 {selectedAgent.phone}</p>
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>✉️ Email:</strong>
+                    <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>{selectedAgent.email}</p>
+                  </div>
+                </div>
+                <div>
+                  <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>📍 Specialization:</strong>
+                  <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>{selectedAgent.specialization}</p>
+                </div>
+                <div>
+                  <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>⏳ Experience:</strong>
+                  <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>{selectedAgent.experience}</p>
+                </div>
+                <div style={{ backgroundColor: '#f8fafc', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #c48b63' }}>
+                  <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>💡 Go-To Malta Tip:</strong>
+                  <p style={{ margin: '8px 0 0 0', color: '#475569', fontStyle: 'italic' }}>"{selectedAgent.tip}"</p>
+                </div>
+                <div>
+                  <strong style={{ color: '#1e293b', fontSize: '0.95rem' }}>✨ Fun Fact:</strong>
+                  <p style={{ margin: '5px 0 0 0', color: '#64748b' }}>{selectedAgent.fact}</p>
+                </div>
+              </div>
+
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }
