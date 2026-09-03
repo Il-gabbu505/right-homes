@@ -5,37 +5,43 @@ import { motion as motion3d } from 'framer-motion-3d';
 import { motion, AnimatePresence } from 'framer-motion';
 import DoorModel from './Door'; 
 
-// --- EXCLUSIVELY EXCEL DATA (With Images) ---
+// --- EXCLUSIVELY EXCEL DATA (Using Local Public Folder Images) ---
 const MOCK_AGENTS = [
   { 
-    id: 1, name: 'Caroline Agius', role: 'Receptionist', phone: '77160394', email: 'caroline@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=250&q=80',
+    id: 1, name: 'Caroline Agius', role: 'Receptionist', phone: '77160394', email: 'caroline@righthomes.com.mt', 
+    image: '/caroline.jpg',
     specialization: 'Updating systems and ensuring smooth operations', experience: '1 Year', 
     tip: 'Direct people to the right agent.', fact: 'I am a little bit clumsy sometimes!'
   },
   { 
-    id: 2, name: 'Clint Barbara', role: 'Real Estate Agent', phone: '79709796', email: 'clint@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    id: 2, name: 'Clint Barbara', role: 'Real Estate Agent', phone: '79709796', email: 'clint@righthomes.com.mt', 
+    image: '/clint.jpg',
     specialization: 'South/Central West Areas (Mqabba, Qrendi, Kirkop, Zurrieq, Safi, Siggiewi, Zebbug)', experience: '8 Years', 
     tip: 'Know your priorities, but keep an open mind. Focus on location and potential, because finishes can change, but fundamentals usually can’t.', fact: 'I’m a people person by nature. Even when off duty, I imagine how properties could be transformed.'
   },
   { 
-    id: 3, name: 'Mehdi Bezine', role: 'Real Estate Agent', phone: '99978211', email: 'mehdi@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    id: 3, name: 'Mehdi Bezine', role: 'Real Estate Agent', phone: '99978211', email: 'mehdi@righthomes.com.mt', 
+    image: '/mehdi.jpg',
     specialization: 'Central & North Malta', experience: '11 Years', 
     tip: 'The best time to buy is always 5 years ago, the next best time is today!', fact: 'I’m a father of 3 daughters, love traveling and always learning.'
   },
   { 
-    id: 4, name: 'Marlon Sammut', role: 'Real Estate Agent', phone: '79919212', email: 'marlon@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    id: 4, name: 'Marlon Sammut', role: 'Real Estate Agent', phone: '79919212', email: 'marlon@righthomes.com.mt', 
+    image: '/marlon.JPG',
     specialization: 'Central Malta', experience: '1 Year', 
     tip: 'If you love a property, act with confidence. Good opportunities don’t always stay on the market for long.', fact: 'I believe every property has a story, I just help people find theirs.'
   },
   { 
-    id: 5, name: 'Quelin Sammut', role: 'Real Estate Agent', phone: '79958686', email: 'quelin@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=250&q=80',
+    id: 5, name: 'Quelin Sammut', role: 'Real Estate Agent', phone: '79958686', email: 'quelin@righthomes.com.mt', 
+    image: '/quelin.JPG',
     specialization: 'Central Malta', experience: '4 Years', 
     tip: 'Be clear about your priorities, but keep an open mind. Sometimes the right property isn’t the one you initially pictured.', fact: 'I wanted to be an architect—now I just judge floor plans for a living.'
   },
   { 
-    id: 6, name: 'Leanne Gatt', role: 'Real Estate Agent', phone: '79244282', email: 'leanne@righthomes.com.mt', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=250&q=80',
-    specialization: 'South Malta', experience: '5 Years', 
-    tip: 'Price matters. Location matters more.', fact: 'I’m a fan of good food, good laughs, great company and unforgettable family trips. ❤️'
+    id: 6, name: 'Jeffrey Briffa Cauchi', role: 'Real Estate Agent', phone: '77098050', email: 'jeffrey@righthomes.com.mt', 
+    image: '/jeffrey.jpg',
+    specialization: 'Residential Property Sales', experience: 'Experienced Professional', 
+    tip: 'Always view a property in person before making your final decision.', fact: 'Passionate about local Maltese architecture.'
   }
 ];
 
