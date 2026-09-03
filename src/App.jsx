@@ -9,7 +9,6 @@ import Footer from './components/Footer';
 import './App.css';
 
 // --- CUSTOM ANIMATED NAV LINK ---
-// We added an onClick prop so the mobile menu can close when a link is tapped!
 const AnimatedNavLink = ({ to, children, onClick }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -22,7 +21,7 @@ const AnimatedNavLink = ({ to, children, onClick }) => {
         style={{
           color: isActive ? '#ffffff' : '#94a3b8', 
           fontWeight: isActive ? '700' : '400',    
-          fontSize: '1rem', // Slightly larger for better touch targets on mobile
+          fontSize: '1rem', 
           fontFamily: '"Inter", sans-serif',
           transition: 'color 0.2s ease',
           position: 'relative',
@@ -68,30 +67,22 @@ function AnimatedRoutes() {
 
 // --- MAIN APP ---
 export default function App() {
-  // State to track if the screen is mobile sized
   const [isMobile, setIsMobile] = useState(false);
-  // State to track if the mobile menu is open
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Detect screen size for responsiveness
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
-      // Close menu automatically if they rotate their iPad/phone to landscape (desktop size)
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
       }
     };
     
-    // Check initial size
     handleResize();
-    
-    // Add event listener
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Lock scrolling when the mobile menu is open
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
@@ -106,24 +97,25 @@ export default function App() {
         display: 'flex', 
         justifyContent: 'space-between', 
         alignItems: 'center', 
-        padding: isMobile ? '0 20px' : '0 60px', // Smaller padding on mobile
-        height: '80px',
+        padding: isMobile ? '0 20px' : '0 60px', 
+        height: '100px', // Increased height to comfortably fit the bigger logo
         backgroundColor: '#000000', 
         position: 'sticky', 
         top: 0, 
         zIndex: 1000,
       }}>
         
-        {/* --- IMAGE LOGO --- */}
-        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }} onClick={() => setIsMenuOpen(false)}>
+        {/* --- UPDATED IMAGE LOGO --- */}
+        <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', marginLeft: '-15px' }} onClick={() => setIsMenuOpen(false)}>
           <motion.div whileHover={{ scale: 1.02 }}>
             <img 
-              src="/logo.webp" 
+              src="/latest.png" 
               alt="Right Homes Real Estate" 
-              style={{ height: isMobile ? '50px' : '65px', width: 'auto', display: 'block' }} // Slightly smaller logo on mobile
+              style={{ height: isMobile ? '65px' : '85px', width: 'auto', display: 'block' }}
             />
           </motion.div>
         </Link>
+        {/* -------------------------- */}
 
         {/* --- DESKTOP NAVIGATION --- */}
         {!isMobile && (
@@ -144,11 +136,10 @@ export default function App() {
               border: 'none', 
               color: '#ffffff', 
               cursor: 'pointer',
-              padding: '10px', // Generous touch target
-              zIndex: 1001 // Ensure it stays above the menu overlay
+              padding: '10px', 
+              zIndex: 1001 
             }}
           >
-            {/* SVG morphs between a Hamburger (≡) and a Close (X) icon */}
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               {isMenuOpen ? (
                 <>
@@ -177,11 +168,11 @@ export default function App() {
             transition={{ duration: 0.2 }}
             style={{
               position: 'fixed',
-              top: '80px', // Right below the navbar
+              top: '100px', // Updated to match the new navbar height
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: '#0a0a0a', // Deep dark background for the menu
+              backgroundColor: '#0a0a0a', 
               zIndex: 999,
               display: 'flex',
               flexDirection: 'column',
@@ -194,7 +185,6 @@ export default function App() {
             <AnimatedNavLink to="/articles" onClick={() => setIsMenuOpen(false)}>Articles</AnimatedNavLink>
             <AnimatedNavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</AnimatedNavLink>
             
-            {/* Quick Contact Info in Mobile Menu */}
             <div style={{ marginTop: 'auto', borderTop: '1px solid #1e293b', paddingTop: '30px', color: '#94a3b8', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ color: '#c27329' }}>📞</span> +356 9997 8211
@@ -208,7 +198,7 @@ export default function App() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main style={{ minHeight: 'calc(100vh - 80px)', overflowX: 'hidden' }}>
+      <main style={{ minHeight: 'calc(100vh - 100px)', overflowX: 'hidden' }}>
         <AnimatedRoutes />
       </main>
 

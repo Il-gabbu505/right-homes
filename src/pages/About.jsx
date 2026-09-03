@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Environment, useTexture } from '@react-three/drei';
 import { motion as motion3d } from 'framer-motion-3d';
@@ -77,8 +77,102 @@ export default function About() {
 
   const cameraWalkVariants = {
     initial: { z: 0 }, 
-    entered: { z: 9, transition: { duration: 1.5, ease: "easeInOut", delay: 0.5 } } 
+    entered: { z: 9, transition: { duration: 3.5, ease: "easeInOut", delay: 1.0 } } 
   };
+
+  // OPTIMIZATION 1: Memoize the heavy 3D scene so it never re-renders when a modal is clicked
+  const MemoizedCanvas = useMemo(() => (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+      <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+        <ambientLight intensity={0.8} />
+        <directionalLight position={[5, 10, 5]} intensity={1.5} />
+        <Environment preset="city" />
+        <Suspense fallback={null}>
+          <motion3d.group variants={cameraWalkVariants} initial="initial" animate={isEntered ? "entered" : "initial"} position={[0, -1, 0]}>
+            <DoorModel isEntered={isEntered} scale={1.7} position={[0, -1.5, -0.2]} />
+            <mesh position={[-11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+            <mesh position={[11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+            <mesh position={[0, 7.5, -0.2]}><boxGeometry args={[3, 10, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+            <mesh position={[0, -1.9, 10]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[40, 20]} /><meshStandardMaterial color="#95a5a6" /></mesh>
+            <InteriorBackground />
+          </motion3d.group>
+        </Suspense>
+      </Canvas>
+    </div>
+  ), [isEntered]);
+
+  // OPTIMIZATION 2: Memoize the agent cards list to prevent 6 heavy layout calculations on click
+  const MemoizedAgentList = useMemo(() => (
+    <div 
+      ref={carouselRef} 
+      className="hide-scroll"
+      style={{ 
+        display: 'flex', gap: '25px', overflowX: 'auto', padding: '30px 10px',
+        scrollBehavior: 'smooth' 
+      }}
+    >
+      {MOCK_AGENTS.map((agent, index) => (
+        <motion.div 
+          key={agent.id} 
+          initial="hidden"
+          animate={isEntered ? "visible" : "hidden"}
+          whileHover="hover"
+          onClick={() => setSelectedAgent(agent)} 
+          variants={{
+            hidden: { y: 50, opacity: 0, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)' },
+            visible: { 
+              y: 0, opacity: 1, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
+              transition: { delay: 2.0 + (index * 0.05), type: 'spring', stiffness: 100 }
+            },
+            hover: { 
+              y: -12, 
+              borderColor: '#c48b63', 
+              boxShadow: '0 25px 50px -15px rgba(196, 139, 99, 0.4)',
+              transition: { type: 'spring', stiffness: 300 }
+            }
+          }}
+          style={{ 
+            background: '#ffffff', padding: '40px 20px', borderRadius: '16px', 
+            textAlign: 'center', borderStyle: 'solid', borderWidth: '1px',
+            minWidth: '260px', flexShrink: 0, cursor: 'pointer',
+            willChange: 'transform, opacity, box-shadow' // Hardware acceleration hint
+          }}
+        >
+          <div style={{ 
+            width: '130px', height: '140px', margin: '0 auto 25px', 
+            backgroundColor: '#0a0a0a', 
+            borderRadius: '60px 15px 60px 15px', 
+            overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)'
+          }}>
+            <motion.img 
+              src={agent.image} 
+              alt={agent.name} 
+              variants={{
+                hidden: { scale: 1, opacity: 0.85 },
+                visible: { scale: 1, opacity: 0.85 },
+                hover: { scale: 1.15, opacity: 1 }
+              }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+          </div>
+
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', color: '#c48b63', fontWeight: '700' }}>{agent.name}</h3>
+          <p style={{ margin: '0 0 20px 0', color: '#64748b', fontSize: '0.85rem', fontWeight: '500', minHeight: '20px' }}>{agent.role}</p>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#475569', fontSize: '0.8rem', fontWeight: '500' }}>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              📞 +356 {agent.phone}
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              ✉️ {agent.email}
+            </span>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  ), [isEntered]); // Only re-render list if 'isEntered' changes, ignore selectedAgent
 
   return (
     <div style={{ position: 'relative', height: '100vh', background: '#ecf0f1', overflow: 'hidden', fontFamily: '"Inter", sans-serif' }}>
@@ -89,23 +183,7 @@ export default function About() {
       `}</style>
 
       {/* --- 1. THE 3D SCENE --- */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[5, 10, 5]} intensity={1.5} />
-          <Environment preset="city" />
-          <Suspense fallback={null}>
-            <motion3d.group variants={cameraWalkVariants} initial="initial" animate={isEntered ? "entered" : "initial"} position={[0, -1, 0]}>
-              <DoorModel isEntered={isEntered} scale={1.7} position={[0, -1.5, -0.2]} />
-              <mesh position={[-11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-              <mesh position={[11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-              <mesh position={[0, 7.5, -0.2]}><boxGeometry args={[3, 10, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-              <mesh position={[0, -1.9, 10]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[40, 20]} /><meshStandardMaterial color="#95a5a6" /></mesh>
-              <InteriorBackground />
-            </motion3d.group>
-          </Suspense>
-        </Canvas>
-      </div>
+      {MemoizedCanvas}
 
       {/* --- 2. THE UI OVERLAY --- */}
       <motion.div
@@ -175,74 +253,9 @@ export default function About() {
             ❯
           </motion.button>
 
-          <div 
-            ref={carouselRef} 
-            className="hide-scroll"
-            style={{ 
-              display: 'flex', gap: '25px', overflowX: 'auto', padding: '30px 10px',
-              scrollBehavior: 'smooth' 
-            }}
-          >
-            {MOCK_AGENTS.map((agent, index) => (
-              <motion.div 
-                key={agent.id} 
-                initial="hidden"
-                animate={isEntered ? "visible" : "hidden"}
-                whileHover="hover"
-                onClick={() => setSelectedAgent(agent)} 
-                variants={{
-                  hidden: { y: 50, opacity: 0, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)' },
-                  visible: { 
-                    y: 0, opacity: 1, borderColor: '#f1f5f9', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
-                    transition: { delay: 2.0 + (index * 0.05), type: 'spring', stiffness: 100 }
-                  },
-                  hover: { 
-                    y: -12, 
-                    borderColor: '#c48b63', 
-                    boxShadow: '0 25px 50px -15px rgba(196, 139, 99, 0.4)',
-                    transition: { type: 'spring', stiffness: 300 }
-                  }
-                }}
-                style={{ 
-                  background: '#ffffff', padding: '40px 20px', borderRadius: '16px', 
-                  textAlign: 'center', borderStyle: 'solid', borderWidth: '1px',
-                  minWidth: '260px', flexShrink: 0, cursor: 'pointer' 
-                }}
-              >
-                <div style={{ 
-                  width: '130px', height: '140px', margin: '0 auto 25px', 
-                  backgroundColor: '#0a0a0a', 
-                  borderRadius: '60px 15px 60px 15px', 
-                  overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)'
-                }}>
-                  <motion.img 
-                    src={agent.image} 
-                    alt={agent.name} 
-                    variants={{
-                      hidden: { scale: 1, opacity: 0.85 },
-                      visible: { scale: 1, opacity: 0.85 },
-                      hover: { scale: 1.15, opacity: 1 }
-                    }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                  />
-                </div>
-
-                <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', color: '#c48b63', fontWeight: '700' }}>{agent.name}</h3>
-                <p style={{ margin: '0 0 20px 0', color: '#64748b', fontSize: '0.85rem', fontWeight: '500', minHeight: '20px' }}>{agent.role}</p>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', color: '#475569', fontSize: '0.8rem', fontWeight: '500' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    📞 +356 {agent.phone}
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    ✉️ {agent.email}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {/* Render the optimized list */}
+          {MemoizedAgentList}
+          
         </div>
       </motion.div>
 
@@ -257,7 +270,8 @@ export default function About() {
               position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
               backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, 
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
-              fontFamily: '"Inter", sans-serif'
+              fontFamily: '"Inter", sans-serif',
+              willChange: 'opacity' // OPTIMIZATION 3: Hardware accelerate the overlay
             }}
           >
             <motion.div 
@@ -266,7 +280,8 @@ export default function About() {
               style={{
                 backgroundColor: 'white', borderRadius: '16px', padding: '40px', 
                 maxWidth: '600px', width: '100%', position: 'relative',
-                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
+                willChange: 'transform, opacity' // OPTIMIZATION 3: Hardware accelerate the modal
               }}
             >
               <button 

@@ -55,15 +55,15 @@ export default function Footer() {
         {/* Column 1: Logo & Contact */}
         <div>
           
-          {/* --- IMAGE LOGO --- */}
+          {/* --- UPDATED IMAGE LOGO --- */}
           <div style={{ marginBottom: '25px' }}>
             <img 
-              src="/logo.webp" /* Matches the image file in your public folder */
+              src="/latest.png" 
               alt="Right Homes Real Estate" 
-              style={{ height: '55px', width: 'auto', display: 'block', marginLeft: '-5px' }}
+              style={{ height: '100px', width: 'auto', display: 'block', marginLeft: '-15px' }}
             />
           </div>
-          {/* ------------------ */}
+          {/* -------------------------- */}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '30px' }}>
             <div style={{ display: 'flex', alignItems: 'center', ...textStyle }}>
