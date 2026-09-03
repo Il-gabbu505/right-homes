@@ -80,7 +80,6 @@ export default function About() {
     entered: { z: 9, transition: { duration: 3.5, ease: "easeInOut", delay: 1.0 } } 
   };
 
-  // OPTIMIZATION 1: Memoize the heavy 3D scene so it never re-renders when a modal is clicked
   const MemoizedCanvas = useMemo(() => (
     <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
       <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
@@ -99,9 +98,8 @@ export default function About() {
         </Suspense>
       </Canvas>
     </div>
-  ), [isEntered]);
+  ), [isEntered, cameraWalkVariants]);
 
-  // OPTIMIZATION 2: Memoize the agent cards list to prevent 6 heavy layout calculations on click
   const MemoizedAgentList = useMemo(() => (
     <div 
       ref={carouselRef} 
@@ -128,14 +126,14 @@ export default function About() {
               y: -12, 
               borderColor: '#c48b63', 
               boxShadow: '0 25px 50px -15px rgba(196, 139, 99, 0.4)',
-              transition: { type: 'spring', stiffness: 300 }
+              transition: { duration: 0.3, ease: 'easeOut' } // Replaced heavy spring with lightweight easeOut
             }
           }}
           style={{ 
             background: '#ffffff', padding: '40px 20px', borderRadius: '16px', 
             textAlign: 'center', borderStyle: 'solid', borderWidth: '1px',
             minWidth: '260px', flexShrink: 0, cursor: 'pointer',
-            willChange: 'transform, opacity, box-shadow' // Hardware acceleration hint
+            willChange: 'transform, opacity' // Removed box-shadow to free up GPU memory
           }}
         >
           <div style={{ 
@@ -153,8 +151,8 @@ export default function About() {
                 visible: { scale: 1, opacity: 0.85 },
                 hover: { scale: 1.15, opacity: 1 }
               }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              transition={{ duration: 0.3, ease: 'easeOut' }} // Matched image tween to card tween
+              style={{ width: '100%', height: '100%', objectFit: 'cover', willChange: 'transform' }} // Added hardware hint to image
             />
           </div>
 
@@ -172,7 +170,7 @@ export default function About() {
         </motion.div>
       ))}
     </div>
-  ), [isEntered]); // Only re-render list if 'isEntered' changes, ignore selectedAgent
+  ), [isEntered]);
 
   return (
     <div style={{ position: 'relative', height: '100vh', background: '#ecf0f1', overflow: 'hidden', fontFamily: '"Inter", sans-serif' }}>
@@ -271,7 +269,7 @@ export default function About() {
               backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 9999, 
               display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
               fontFamily: '"Inter", sans-serif',
-              willChange: 'opacity' // OPTIMIZATION 3: Hardware accelerate the overlay
+              willChange: 'opacity' 
             }}
           >
             <motion.div 
@@ -281,7 +279,7 @@ export default function About() {
                 backgroundColor: 'white', borderRadius: '16px', padding: '40px', 
                 maxWidth: '600px', width: '100%', position: 'relative',
                 boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-                willChange: 'transform, opacity' // OPTIMIZATION 3: Hardware accelerate the modal
+                willChange: 'transform, opacity' 
               }}
             >
               <button 
