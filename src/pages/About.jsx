@@ -8,10 +8,10 @@ import DoorModel from './Door';
 // --- EXCLUSIVELY EXCEL DATA (Using Local Public Folder Images) ---
 const MOCK_AGENTS = [
   { 
-    id: 1, name: 'Caroline Agius', role: 'Receptionist', phone: '77160394', email: 'caroline@righthomes.com.mt', 
-    image: '/caroline.jpg',
-    specialization: 'Updating systems and ensuring smooth operations', experience: '1 Year', 
-    tip: 'Direct people to the right agent.', fact: 'I am a little bit clumsy sometimes!'
+    id: 1, name: 'Mehdi Bezine', role: 'Founder', phone: '77695443', email: 'mehdi@righthomes.com.mt', 
+    image: '/mehdi.jpg',
+    specialization: 'Central & North Malta', experience: '11 Years', 
+    tip: 'The best time to buy is always 5 years ago, the next best time is today!', fact: 'I’m a father of 3 daughters, love traveling and always learning.'
   },
   { 
     id: 2, name: 'Clint Barbara', role: 'Real Estate Agent', phone: '79709796', email: 'clint@righthomes.com.mt', 
@@ -20,10 +20,11 @@ const MOCK_AGENTS = [
     tip: 'Know your priorities, but keep an open mind. Focus on location and potential, because finishes can change, but fundamentals usually can’t.', fact: 'I’m a people person by nature. Even when off duty, I imagine how properties could be transformed.'
   },
   { 
-    id: 3, name: 'Mehdi Bezine', role: 'Real Estate Agent', phone: '99978211', email: 'mehdi@righthomes.com.mt', 
-    image: '/mehdi.jpg',
-    specialization: 'Central & North Malta', experience: '11 Years', 
-    tip: 'The best time to buy is always 5 years ago, the next best time is today!', fact: 'I’m a father of 3 daughters, love traveling and always learning.'
+    id: 3, name: 'Caroline Agius', role: 'Receptionist', phone: '77160394', email: 'caroline@righthomes.com.mt', 
+    image: '/caroline.jpg',
+    specialization: 'Updating systems and ensuring smooth operations', experience: '1 Year', 
+    tip: 'Direct people to the right agent.', fact: 'I am a little bit clumsy sometimes!'
+   
   },
   { 
     id: 4, name: 'Marlon Sammut', role: 'Real Estate Agent', phone: '79919212', email: 'marlon@righthomes.com.mt', 
@@ -55,15 +56,20 @@ function InteriorBackground() {
   );
 }
 
+// --- NEW HELPER COMPONENT ---
+// Triggers the animation only after all 3D assets inside <Suspense> have loaded
+function SceneReadyTrigger({ onReady }) {
+  useEffect(() => {
+    const timer = setTimeout(() => onReady(true), 150);
+    return () => clearTimeout(timer);
+  }, [onReady]);
+  return null;
+}
+
 export default function About() {
   const [isEntered, setIsEntered] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null); 
   const carouselRef = useRef();
-  
-  useEffect(() => {
-    const timer = setTimeout(() => setIsEntered(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const scroll = (direction) => {
     if (carouselRef.current) {
@@ -79,26 +85,6 @@ export default function About() {
     initial: { z: 0 }, 
     entered: { z: 9, transition: { duration: 3.5, ease: "easeInOut", delay: 1.0 } } 
   };
-
-  const MemoizedCanvas = useMemo(() => (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
-      <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[5, 10, 5]} intensity={1.5} />
-        <Environment preset="city" />
-        <Suspense fallback={null}>
-          <motion3d.group variants={cameraWalkVariants} initial="initial" animate={isEntered ? "entered" : "initial"} position={[0, -1, 0]}>
-            <DoorModel isEntered={isEntered} scale={1.7} position={[0, -1.5, -0.2]} />
-            <mesh position={[-11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-            <mesh position={[11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-            <mesh position={[0, 7.5, -0.2]}><boxGeometry args={[3, 10, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
-            <mesh position={[0, -1.9, 10]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[40, 20]} /><meshStandardMaterial color="#95a5a6" /></mesh>
-            <InteriorBackground />
-          </motion3d.group>
-        </Suspense>
-      </Canvas>
-    </div>
-  ), [isEntered, cameraWalkVariants]);
 
   const MemoizedAgentList = useMemo(() => (
     <div 
@@ -126,14 +112,14 @@ export default function About() {
               y: -12, 
               borderColor: '#c48b63', 
               boxShadow: '0 25px 50px -15px rgba(196, 139, 99, 0.4)',
-              transition: { duration: 0.3, ease: 'easeOut' } // Replaced heavy spring with lightweight easeOut
+              transition: { duration: 0.3, ease: 'easeOut' }
             }
           }}
           style={{ 
             background: '#ffffff', padding: '40px 20px', borderRadius: '16px', 
             textAlign: 'center', borderStyle: 'solid', borderWidth: '1px',
             minWidth: '260px', flexShrink: 0, cursor: 'pointer',
-            willChange: 'transform, opacity' // Removed box-shadow to free up GPU memory
+            willChange: 'transform, opacity' 
           }}
         >
           <div style={{ 
@@ -151,8 +137,8 @@ export default function About() {
                 visible: { scale: 1, opacity: 0.85 },
                 hover: { scale: 1.15, opacity: 1 }
               }}
-              transition={{ duration: 0.3, ease: 'easeOut' }} // Matched image tween to card tween
-              style={{ width: '100%', height: '100%', objectFit: 'cover', willChange: 'transform' }} // Added hardware hint to image
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', willChange: 'transform' }}
             />
           </div>
 
@@ -181,7 +167,29 @@ export default function About() {
       `}</style>
 
       {/* --- 1. THE 3D SCENE --- */}
-      {MemoizedCanvas}
+      {/* Note: The Canvas has been un-memoized and placed directly here to prevent 
+          React from remounting the 3D scene when `isEntered` changes, which saves memory 
+          and prevents stuttering. */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+        <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[5, 10, 5]} intensity={1.5} />
+          <Environment preset="city" />
+          <Suspense fallback={null}>
+            {/* Our new trigger waits for everything above to load */}
+            <SceneReadyTrigger onReady={setIsEntered} />
+            
+            <motion3d.group variants={cameraWalkVariants} initial="initial" animate={isEntered ? "entered" : "initial"} position={[0, -1, 0]}>
+              <DoorModel isEntered={isEntered} scale={1.7} position={[0, -1.5, -0.2]} />
+              <mesh position={[-11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+              <mesh position={[11.5, 3, -0.2]}><boxGeometry args={[20, 15, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+              <mesh position={[0, 7.5, -0.2]}><boxGeometry args={[3, 10, 0.5]} /><meshStandardMaterial color="#ecf0f1" /></mesh>
+              <mesh position={[0, -1.9, 10]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[40, 20]} /><meshStandardMaterial color="#95a5a6" /></mesh>
+              <InteriorBackground />
+            </motion3d.group>
+          </Suspense>
+        </Canvas>
+      </div>
 
       {/* --- 2. THE UI OVERLAY --- */}
       <motion.div
