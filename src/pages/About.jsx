@@ -24,7 +24,6 @@ const MOCK_AGENTS = [
     image: '/caroline.jpg',
     specialization: 'Updating systems and ensuring smooth operations', experience: '1 Year', 
     tip: 'Direct people to the right agent.', fact: 'I am a little bit clumsy sometimes!'
-   
   },
   { 
     id: 4, name: 'Marlon Sammut', role: 'Real Estate Agent', phone: '79919212', email: 'marlon@righthomes.com.mt', 
@@ -167,9 +166,6 @@ export default function About() {
       `}</style>
 
       {/* --- 1. THE 3D SCENE --- */}
-      {/* Note: The Canvas has been un-memoized and placed directly here to prevent 
-          React from remounting the 3D scene when `isEntered` changes, which saves memory 
-          and prevents stuttering. */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
         <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
           <ambientLight intensity={0.8} />
@@ -259,7 +255,6 @@ export default function About() {
             ❯
           </motion.button>
 
-          {/* Render the optimized list */}
           {MemoizedAgentList}
           
         </div>
@@ -347,3 +342,6 @@ export default function About() {
     </div>
   );
 }
+
+// --- PRELOAD ASSETS FOR INSTANT MOUNTING ---
+useTexture.preload('/background.webp');
